@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+A_TRACE	anagram.h	24;"	d
+A_TRACE	anagram.h	26;"	d
+ERR_ALL	anagram.h	17;"	d
+ERR_BLANK_LINE	anagram.h	31;"	d
+ERR_CRITICAL	anagram.h	18;"	d
+ERR_MAJOR	anagram.h	19;"	d
+ERR_MINOR	anagram.h	20;"	d
+ERR_UNEXPECTED_EOF	anagram.h	32;"	d
+FAILURE	anagram.h	13;"	d
+MAX_ANAGRAM_LEN	anagram.h	14;"	d
+MAX_LINE_LENGTH	anagram.h	15;"	d
+SUCCESS	anagram.h	12;"	d
+_ANAGRAM_H	anagram.h	10;"	d
+anagram_checker	util.c	/^int anagram_checker(int table1[MAX_ANAGRAM_LEN], int table2[MAX_ANAGRAM_LEN])$/;"	f
+ang_error	util.c	/^void ang_error(int err_level,$/;"	f
+count_letters	util.c	/^void count_letters(char *str, $/;"	f
+g_error_level	util.c	/^int g_error_level = ERR_ALL;$/;"	v
+get_line	util.c	/^int get_line(char buf[], $/;"	f
+letter_index_converter	util.c	/^int letter_index_converter(char c)$/;"	f
+main	main.c	/^int main(int argc, char *argv[])$/;"	f
+no_print	util.c	/^no_print(char * str)$/;"	f

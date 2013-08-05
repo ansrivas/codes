@@ -1,0 +1,14 @@
+# Make File for anagram program trace
+
+anagram_trace: main.o util.o anagram.h
+	gcc -o anagram_trace -DTRACE main.o util.o
+
+main.o: main.c anagram.h
+	gcc -c -DTRACE main.c
+	
+util.o: util.c anagram.h
+	gcc -c -DTRACE util.c
+
+clean:
+	rm anagram_trace
+	rm *.o

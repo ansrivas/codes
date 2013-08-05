@@ -1,0 +1,9 @@
+/**************************************************************************
+*
+* FUNCTION NAME: next
+*
+* DESCRIPTION: Sample function for storage allocation program
+*
+* RETURNS: Returns number of bits
+**************************************************************************/
+

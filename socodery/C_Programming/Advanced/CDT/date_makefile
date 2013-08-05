@@ -1,0 +1,12 @@
+date: date_main.o date_functions.o
+	gcc -o date date_main.o date_functions.o
+
+date_main.o: date_main.c date_prototype.h
+	gcc -c date_main.c
+
+date_functions.o: date_functions.c date_prototype.h
+	gcc -c date_functions.c
+
+clean:
+	rm *.o
+	rm date

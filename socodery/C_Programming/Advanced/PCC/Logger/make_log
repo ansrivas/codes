@@ -1,0 +1,13 @@
+output_l: logger.o main_logger.o
+	gcc -DLOG -o output_l logger.o main_logger.o
+
+logger.o: logger.c
+	gcc -DLOG -c logger.c
+
+main_logger.o: main_logger.c
+	gcc -DLOG -c main_logger.c
+
+clean:
+	rm *.o
+	rm log.txt
+	rm output_l

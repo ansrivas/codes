@@ -1,0 +1,12 @@
+FLAGS= -Wall -g
+all: producer_consumer
+
+producer_consumer: producer_consumer.o
+	gcc -g -o producer_consumer producer_consumer.o -L ../queue_v2 -lplatform -lpthread
+
+producer_consumer.o: producer_consumer.c
+	gcc -o producer_consumer.o $(FLAGS) -c -I../queue_v2 producer_consumer.c
+
+clean:
+	rm *.o
+	rm producer_consumer

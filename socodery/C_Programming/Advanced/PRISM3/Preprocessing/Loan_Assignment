@@ -1,0 +1,52 @@
+
+Implement a progam to calculate the monthly payment for a loan. It also prints
+the payoff table to show the balance of the loan after each monthly payment.
+
+The program prompts the user for input, as follows:
+--------------------------------------------
+Amount of the loan (Principal)? 5000.00
+Interest rate per year (percent )? 11
+Number of years : 1
+--------------------------------------------
+
+Output of the program for the above input should be
+---------------------------------------------------
+Amount of the loan : 5000.00
+Interest per year (percent) : 11
+Interest rate per month (decimal) : 0.009167 
+Number of years: 1
+Number of months :12
+Monthly Payment: 441.91
+
+Month  Old Balance  Monthly Payment  Interest Paid  Principal Paid  New Balance
+1	5000.00		441.91		45.83		396.08		4603.92
+2	4603.92		441.91		42.20		399.71		4204.21
+3	4204.21		441.91		38.54		403.37		3800.84
+4	3800.84		441.91		34.84		407.07		3393.77
+5	3393.77		441.91		31.11		410.80		2982.97
+6	2982.97		441.91		27.34		414.57		2568.40
+7	2568.40		441.91		23.54		418.37		2150.03
+8	2150.03		441.91		19.71		422.20		1727.83
+9	1727.83		441.91		15.84		426.07		1301.76
+10	1301.76		441.91		11.93		429.98		871.78
+11	871.78		441.91		7.99		433.92		437.86
+12	437.86		441.91		4.01		437.86		0.00
+------------------------------------------------------
+
+Use the following formula for calculations
+
+NM = (NY * 12)
+IM = (IY / 12) / 100
+P  = (1 + IM)^NM
+Q  = (P / (P - 1))
+MP = (PR * NM * Q)
+
+NY - Number of years
+NM - Number of months
+IY - Interest rate per year (percent)
+IM - Interest rate per month (decimal)
+PR - Principal
+	
+Note: Precision is 2 in the sample output	
+
+

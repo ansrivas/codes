@@ -1,0 +1,5 @@
+program: program.c
+	gcc -o program program.c
+clean:
+	rm *.o
+	rm program

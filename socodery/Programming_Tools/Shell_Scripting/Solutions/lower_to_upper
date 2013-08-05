@@ -1,0 +1,12 @@
+# SCRIPT to convert the filenames (args) to uppercase
+if [ $# -eq 0 ]
+then
+        echo "IMPROPER USAGE"
+        exit
+fi
+for i in $*
+do
+        capname=`echo $i | tr '[a-z]' '[A-Z]' `
+        mv $i $capname
+done
+

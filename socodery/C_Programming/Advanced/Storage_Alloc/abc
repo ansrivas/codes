@@ -1,0 +1,84 @@
+	.file	"file1.c"
+	.section	.rodata
+.LC0:
+	.string	"\na1 = %d\n"
+	.text
+.globl main
+	.type	main, @function
+main:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$8, %esp
+	andl	$-16, %esp
+	movl	$0, %eax
+	addl	$15, %eax
+	addl	$15, %eax
+	shrl	$4, %eax
+	sall	$4, %eax
+	subl	%eax, %esp
+	movl	$2, a1
+	subl	$8, %esp
+	pushl	a1
+	pushl	$.LC0
+	call	printf
+	addl	$16, %esp
+	call	next
+	subl	$8, %esp
+	pushl	a1
+	pushl	$.LC0
+	call	printf
+	addl	$16, %esp
+	call	next1
+	subl	$8, %esp
+	pushl	a1
+	pushl	$.LC0
+	call	printf
+	addl	$16, %esp
+	movl	$0, %eax
+	leave
+	ret
+	.size	main, .-main
+.globl b1
+	.bss
+	.align 4
+	.type	b1, @object
+	.size	b1, 4
+b1:
+	.zero	4
+	.text
+.globl next
+	.type	next, @function
+next:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$4, %esp
+	movb	$97, -1(%ebp)
+	movl	$77, b1
+	leave
+	ret
+	.size	next, .-next
+	.section	.rodata
+.LC2:
+	.string	"%d \n"
+	.text
+.globl next1
+	.type	next1, @function
+next1:
+	pushl	%ebp
+	movl	%esp, %ebp
+	subl	$8, %esp
+	movl	$0x41a26666, %eax
+	movl	%eax, -4(%ebp)
+	subl	$8, %esp
+	pushl	a1
+	pushl	$.LC2
+	call	printf
+	addl	$16, %esp
+	movl	$15, a1
+	leave
+	ret
+	.size	next1, .-next1
+	.comm	a1,4,4
+	.comm	a1,4,4
+	.section	.note.GNU-stack,"",@progbits
+	.ident	"GCC: (GNU) 3.4.3 20041212 (Red Hat 3.4.3-9.EL4)"

@@ -1,0 +1,4 @@
+gcc -c program.c
+gcc -c simplelink.c
+gcc -o dis program.o simplelink.o
+

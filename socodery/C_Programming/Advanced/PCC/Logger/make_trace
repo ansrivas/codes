@@ -1,0 +1,12 @@
+output_t: logger.o main_logger.o
+	gcc -DDEBUG -o output_t logger.o main_logger.o
+
+logger.o: logger.c
+	gcc -DDEBUG -c logger.c
+
+main_logger.o: main_logger.c
+	gcc -DDEBUG -c main_logger.c
+
+clean:
+	rm *.o
+	rm output_t

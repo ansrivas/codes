@@ -1,0 +1,6 @@
+dup fd1: 1
+writing onto standard output
+error closing : 0 : 0
+dup fd2: 3
+Exit function duptest
+hello hall no

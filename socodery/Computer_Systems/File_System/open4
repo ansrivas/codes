@@ -1,0 +1,29 @@
+qwertyuoop[heeeeeeeeeeloGood Morning
+hello
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#define SIZE 1
+int main(int argc,char *argv[])
+{
+  int fd;
+  char buff[SIZE];
+  int n;
+  if(argc!=2)
+   {
+     printf("Usage:%s filename\n",argv[0]);
+     exit(1);
+   }
+  if(-1 == (fd=open(argv[1],O_RDONLY)))
+   {
+	printf("errno : %d \n", errno);
+     perror("The error is : ");
+     exit(1);
+   }
+  while((n=read(fd,buff,SIZE))>0)
+    write(1,buff,n);
+  close(fd);
+ }

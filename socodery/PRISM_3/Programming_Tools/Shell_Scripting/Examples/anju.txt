@@ -1,0 +1,7 @@
+hi this is for a trial
+to be used by a shell scripting file for execution
+to copy few lines and paste to where??
+think so display in std o/p
+so here we go..
+ zoom
+ ...

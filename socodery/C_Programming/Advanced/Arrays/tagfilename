@@ -1,0 +1,26 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+change_position	change_position.c	/^int* change_position(int *array_ptr,int *pos_array,int array_num)$/;"	f
+check	divisibility_check.c	/^void check(int array_length,int *array,int number)$/;"	f
+f	tt.c	/^int *f(){$/;"	f
+func1	array_dbl_pointers_function.c	/^int func1(short mat[][2])   $/;"	f
+func1	array_pointer_rep.c	/^int func1(int mat[][3])   $/;"	f
+func2	array_dbl_pointers_function.c	/^int func2(short (*mat)[3])$/;"	f
+func2	array_pointer_rep.c	/^int func2(int (*ptr)[3])$/;"	f
+func3	array_dbl_pointers_function.c	/^int func3(short *mat)	$/;"	f
+func3	array_pointer_rep.c	/^int func3(int *ptr)	$/;"	f
+func4	array_dbl_pointers_function.c	/^int func4(short **mat)$/;"	f
+func4	array_pointer_rep.c	/^int func4(int **ptr)$/;"	f
+func5	array_dbl_pointers_function.c	/^int func5(short *mat[3])$/;"	f
+main	array_dbl_pointers.c	/^int main()$/;"	f
+main	array_dbl_pointers_function.c	/^int main()$/;"	f
+main	array_of_pointers.c	/^int main() $/;"	f
+main	array_pointer_rep.c	/^int main()$/;"	f
+main	change_position.c	/^int main()$/;"	f
+main	divisibility_check.c	/^int main()$/;"	f
+main	temp.c	/^int main()$/;"	f
+main	tt.c	/^int main()$/;"	f

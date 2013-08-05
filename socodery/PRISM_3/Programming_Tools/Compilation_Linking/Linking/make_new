@@ -1,0 +1,20 @@
+# Sample make file 
+# Make File Name : make_new
+
+# Variables
+CC=gcc
+FLAGS=-c -Wall
+
+simplelink.o:simplelink.c
+	$(CC) $(FLAGS) simplelink.c
+
+program: program.o simplelink.o 
+	gcc -o program program.o simplelink.o
+
+program.o: program.c
+	$(CC) $(FLAGS) program.c
+
+clean:
+	rm *.o
+	rm program
+

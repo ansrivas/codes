@@ -1,0 +1,6 @@
+mkdir textfiles
+for i in *.txt
+do
+	mv $i ./textfiles
+done
+

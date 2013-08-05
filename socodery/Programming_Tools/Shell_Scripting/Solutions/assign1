@@ -1,0 +1,8 @@
+n1=$2
+f=1
+for test $n1 -gt 0
+do
+	f=`expr f \* $n1`
+	n1=`expr $n1-1`
+done
+echo "fact = $f"

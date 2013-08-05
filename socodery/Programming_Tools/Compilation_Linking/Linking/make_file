@@ -1,0 +1,26 @@
+CC = gcc
+CFLAGS = -c -Wall
+
+PROG = program
+HDRS = simplelink.h
+SRCS = program.c simplelink.c
+
+## The following says that the object files have the same name as the 
+## .c files, but with .o
+
+OBJS = $(SRCS:.c=.o)
+
+## This is the first rule : Build the program from two .o's
+
+$(PROG) : $(OBJS)
+	$(CC) $(OBJS) -o $(PROG)
+
+program.o: program.c simplelink.c simplelink.h
+
+simplelink.o: simplelink.c simplelink.h
+
+## Remove all the compilation files
+
+clean:
+	rm $(PROG) $(OBJS)
+	

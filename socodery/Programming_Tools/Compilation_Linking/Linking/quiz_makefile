@@ -1,0 +1,49 @@
+#******************************************************************************
+#        Makefile for ESL entity of HSS-Gateway
+#  
+#                
+#  
+#        DATE               NAME            REFERENCE        REASON
+#        ----               ----            ---------        ------
+#        2nd Sept 2002     xxxxxx                        Initial Version
+#  
+#  
+#          2006  Inc  All Rights Reserved
+#******************************************************************************
+include $(ESL_DEV_DIR)/build/make/solaris/makefile.mk
+
+ESL_REFER_SLP_DIR		=	$(ESL_DEV_DIR)/slp/refer
+
+INCLUDE				+=	-I $(ESL_DEV_DIR)/common/h \
+				        -I $(GW_COMMON)/common/h \
+					-I $(MGC_HDR_DIR)/common/h \
+					-I $(ESL_DEV_DIR)/inf/adapter/sf/h \
+					-I $(ESL_DEV_DIR)/inf/adapter/eta/h \
+					-I $(ESL_DEV_DIR)/inf/esldb/h \
+					-I $(ESL_DEV_DIR)/extintf/h \
+					-I $(ESL_DEV_DIR)/common/sib/h \
+					-I $(ESL_REFER_SLP_DIR)/h \
+                                        -I $(SF_HDR_DIR)/ext_interface
+
+SRCDIR				=	$(ESL_REFER_SLP_DIR)/src
+
+OBJDIR				=	$(ESL_REFER_SLP_DIR)/bin/$(CPU)
+
+SRCFILES			=	$(SRCDIR)/ss_esl_refer_main.c
+
+OBJFILES			=	$(OBJDIR)/ss_esl_refer_main.o
+
+CFLAGS				+=	-D__ANSI_C__ 
+
+
+all	: $(OBJFILES)
+		$(CC) -G -o libeslrefer.so $(OBJFILES)
+		mv libeslrefer.so $(ESL_LIB)
+
+$(OBJFILES) : $(SRCFILES)
+		$(CC) -c $(CFLAGS) $(SRCFILES)
+
+clean :
+		\rm -f $(OBJFILES)
+		\rm -f $(ESL_LIB)/libeslrefer.so
+

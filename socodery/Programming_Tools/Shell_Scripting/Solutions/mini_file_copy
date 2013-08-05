@@ -1,0 +1,8 @@
+mkdir mini
+for i in `find . -size -10c -print`
+do
+cp $i ./mini
+done
+cd mini
+cd ..
+

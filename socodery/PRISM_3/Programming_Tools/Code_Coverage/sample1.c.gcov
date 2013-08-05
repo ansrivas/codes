@@ -1,0 +1,13 @@
+        -:    0:Source:sample1.c
+        -:    0:Graph:sample1.gcno
+        -:    0:Data:sample1.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include <stdio.h>
+        -:    2:void link_file()
+function link_file called 1 returned 100% blocks executed 100%
+        1:    3:{
+        1:    4:    printf("This function is just called to link this file\n ");
+        -:    5:    return;
+        -:    6:}
+        -:    7:

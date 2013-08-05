@@ -1,0 +1,576 @@
+1,114c1,40
+< #include    <stdio.h>
+< #include    <stdlib.h>
+< #include    <string.h>
+< #include    <unistd.h>
+< #include    <sys/time.h>
+< #include    <sys/types.h>
+< #include    <sys/socket.h>
+< #include    <netinet/in.h>
+< #include    "prototype.h"
+< #include    "connmgr.h"
+< #include    "msgqueue.h"
+< #include    "threadmgr.h"
+< #include    "msgmgr.h"
+< #include    "timerutility.h"
+< 
+< #define     RESEND_LIMIT      1
+< #define     TIMEOUT_PERIOD    500
+< 
+< typedef enum
+< {
+<     OFF_HOOK=0,
+<     SETUP_INITIATED,
+<     INPROGRESS,
+<     CONNECTED,
+<     TERM_INITIATED,
+<     TERMINATED
+< }CALL_STATES;
+< 
+< typedef enum
+< {
+<     EVT_IN_PROGRESS,
+<     EVT_ANSWER,
+<     EVT_RELEASE_CNF,
+<     EVT_INVALID,
+<     EVT_DATA,
+<     EVT_NO_RESPONSE,
+<     EVT_TIMER_EXPIRED,
+<     EVT_COMMUNICATION_ERROR
+< }CALL_EVENTS;
+< 
+< 
+< typedef struct timerexp
+< {
+<     timerIdType     tId;
+< }timerExpType;
+< 
+< typedef enum
+< {
+<     PACKET_RCVD=0,
+<     TIMER_EXP,
+<     COMM_ERROR
+< } enumEventType;
+< 
+< typedef struct eventType
+< {
+<     enumEventType  event;
+<     union
+<     {
+<         timerExpType    timer;
+<         message         peermsg;
+<     } eventObj;
+< }eventType;
+< 
+< 
+< QueId     gQ;
+< 
+< 
+< void * timerExpHandler(void * pData)
+< {
+<     returntype      retval;
+<     struct timeval    tv;
+< 
+<     gettimeofday(&tv, NULL);
+<     printf("timer expired : %ld : %ld\n", tv.tv_sec, tv.tv_usec);
+< 
+<     timerExpType *pTimerExpData = (timerExpType*)pData;
+<     eventType    *pEvent  = NULL;
+<     pEvent = (eventType *)malloc(sizeof(eventType));
+<     pEvent->event = TIMER_EXP;
+<     memcpy(&pEvent->eventObj.timer, pTimerExpData, sizeof(timerExpType));
+<     retval = putQueue(gQ, pEvent);
+<     if (FAILURE == retval)
+<     {
+<         printf("could not put timer in the queue \n");
+<     }
+<     return NULL;
+< }
+< 
+< 
+< returntype sendpackettopeer(commpoint sd, message *psentvalue, timerExpType * ptimerData)
+< {
+<     returntype       retval = 0;
+<     trsfrpacket         packet;
+< 
+<     retval = createpacketfrommessage(psentvalue, &packet);
+<     if (FAILURE == retval)
+<     {
+<         return FAILURE;
+<     }
+<     retval = tcpsenddata(sd, (char *)&packet, sizeof(packet));
+<     if (FAILURE == retval)
+<     {
+<         return FAILURE;
+<     }
+<     if (NULL != ptimerData)
+<     {
+<         retval = createTimer(TIMEOUT_PERIOD, 1, timerExpHandler, ptimerData, &ptimerData->tId);
+<         if (FAILURE == retval)
+<         {
+<             printf("cannot create a timer");
+<             return FAILURE;
+<         }
+<     }
+<     return SUCCESS;
+---
+> #include	<stdio.h>
+> #include	<stdlib.h>
+> #include	<string.h>
+> #include	<unistd.h>
+> #include	<sys/types.h>
+> #include	<sys/time.h>
+> #include	<sys/socket.h>
+> #include	<netinet/in.h>
+> #include	<arpa/inet.h>
+> #include	"prototype.h"
+> #include	"platform.h"
+> #include	"timerutility.h"
+> 
+> #define 	RESEND_LIMIT	10
+> #define 	TIMEOUT_PERIOD	200
+> 
+> typedef struct TimerExp
+> {
+> 	int 		sd;
+> 	int 		resendcount;
+> 	TrsfrPacket	packet;
+> }TimerExpType;
+> 
+> void * sendData(void * pData)
+> {
+> 	struct timeval	tv;
+> 	TimerExpType * pTimerExpData = (TimerExpType*)pData;
+> 	gettimeofday(&tv, NULL);
+> 	if (pTimerExpData->resendcount >= 0)
+> 	{
+> 		write(pTimerExpData->sd, &pTimerExpData->packet, sizeof(TrsfrPacket));
+> 		printf("timer expired : %u : %u\n", tv.tv_sec, tv.tv_usec);
+> 	}
+> 	else
+> 	{
+> 		printf("server not responding \n");
+> //		close(pTimerExpData->sd);
+> 	}
+> 	pTimerExpData->resendcount--;
+> 	return NULL;
+118,173d43
+< void * receivedataonchannel(void * pInput)
+< {
+<     int             cretval = FAILURE;
+<     int             qretval = FAILURE;
+<     eventType       *pEvent = NULL;
+<     commpoint       sd = *(commpoint *)pInput;
+<     trsfrpacket     packet;
+< 
+<     while(1)
+<     {
+<         cretval = tcpreceivedata(sd, (char *)&packet, sizeof(trsfrpacket));
+<         if (FAILURE == cretval)
+<         {
+<             break;
+<         }
+<         else
+<         {
+<             pEvent = (eventType *)malloc(sizeof(eventType));
+<             pEvent->event = PACKET_RCVD;
+<             createmessagefrompacket(&packet, &pEvent->eventObj.peermsg);
+<         }
+<         qretval = putQueue(gQ, pEvent);
+<         if (FAILURE == qretval)
+<         {
+<             free(pEvent);
+<             break;
+<         }
+<     }
+<     return NULL;
+< }
+< 
+< 
+< returntype getevent(CALL_EVENTS * pEvent, message *precvdvalue)
+< {
+<     eventType        *pObject = NULL;
+<     pObject = (eventType*) getQueue(gQ);
+<     if (NULL == pObject)
+<     {
+<         return FAILURE;
+<     }
+<     if (TIMER_EXP == pObject->event)
+<     {
+<         *pEvent    = EVT_TIMER_EXPIRED;
+<     }
+<     else if (COMM_ERROR == pObject->event)
+<     {
+<         *pEvent    = EVT_COMMUNICATION_ERROR;
+<     }
+<     else if (PACKET_RCVD == pObject->event)
+<     {
+<         *pEvent = (CALL_EVENTS)pObject->eventObj.peermsg.mtype.switchevent;
+<     }
+<     free(pObject);
+<     return SUCCESS;
+< }
+< 
+177,413c47,170
+<     commpoint          sd = 0;
+<     message            sentvalue;
+<     message            recvdvalue;
+<     ThreadID           thrId;
+<     timerExpType       timerData;
+<     returntype         retval = SUCCESS;
+<     CALL_EVENTS        event;
+<     CALL_STATES        state;
+< 
+<     if (argc != 3) {
+<         printf("please provide following command line arguments\n");
+<         printf("server IP address\n");
+<         printf("server port\n");
+<         exit(1);
+<     }
+<     retval = initializeplatform();
+<     if (FAILURE == retval)
+<     {
+<         printf("platform initialization failed ");
+<         exit(1);
+<     }
+< 
+<     gQ = allocateQueue();
+< 
+<     retval = tcpcreateactivesocketwobind(&sd);
+<     if (FAILURE == retval)
+<     {
+<         printf("cannot create socket \n");
+<         close(sd);
+<         exit(1);
+<     }
+< 
+<     retval = tcpconnect(sd, argv[1], argv[2]);
+<     if (FAILURE == retval)
+<     {
+<         printf("cannot connect to server\n");
+<         close(sd);
+<         exit(1);
+<     }
+<     retval = createthread(&thrId, receivedataonchannel, &sd);
+<     if (FAILURE == retval)
+<     {
+<         printf("cannot create a thread to receive data on socket\n");
+<         close(sd);
+<         exit(1);
+<     }
+< 
+<     state = OFF_HOOK;
+<     printf("sending digits : offhook state\n");
+<     sentvalue.mtype.subscriberevent=SUBS_EVT_DIGITS_DIALLED;
+<     retval = sendpackettopeer(sd, &sentvalue, &timerData);
+<     if (FAILURE == retval)
+<     {
+<         printf("cannot send digits\n");
+<     }
+<     state = INPROGRESS;
+<     printf("going to : inprogress state\n");
+< 
+<     while (1)
+<     {
+<         retval = getevent(&event, &recvdvalue);
+<         if (FAILURE == retval)
+<         {
+<                 printf("cannot get event \n");
+<                 break;
+<         }
+<         switch(state)
+<         {
+<             case OFF_HOOK :
+<                 printf("program should not come here \n");
+<                 break;
+<             case SETUP_INITIATED :
+<                 printf("program should not come here \n");
+<                 break;
+<             case INPROGRESS :
+<                 switch (event)
+<                 {
+<                     case EVT_IN_PROGRESS :
+<                         break;
+<                     case EVT_ANSWER :
+<                         printf("received answer : inprogress state\n");
+<                         retval = deleteTimer(timerData.tId);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("can not delete timer\n");
+<                         }
+<                         else
+<                         {
+<                             printf("timer deleted\n");
+<                         }
+<         		printf("sending data : inprogress state\n");
+<                         sentvalue.mtype.subscriberevent=SUBS_EVT_DATA;
+<                         retval = sendpackettopeer(sd, &sentvalue, NULL);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("cannot send data\n");
+<                         }
+<                 	printf("going to : connected state\n");
+<                         state = CONNECTED;
+<                         break;
+<                     case EVT_RELEASE_CNF :
+<                         break;
+<                     case EVT_INVALID :
+<                         break;
+<                     case EVT_DATA :
+<                         break;
+<                     case EVT_NO_RESPONSE :
+<                         state = TERMINATED;
+<                         break;
+<                     case EVT_TIMER_EXPIRED :
+<                         printf("timer expired : inprogress state\n");
+<         		printf("sending digits again: inprogress state\n");
+<                         sentvalue.mtype.subscriberevent=SUBS_EVT_DIGITS_DIALLED;
+<                         retval = sendpackettopeer(sd, &sentvalue, &timerData);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("cannot send digits\n");
+<                         }
+<                         break;
+<                     case EVT_COMMUNICATION_ERROR :
+<                         state = TERMINATED;
+<                         break;
+<                     default:
+<                         break;
+<                 }
+<                 break;
+<             case CONNECTED :
+<                 switch (event)
+<                 {
+<                     case EVT_IN_PROGRESS :
+<                         break;
+<                     case EVT_ANSWER :
+<                         printf("received answer : connected state\n");
+<         		printf("ignore : connected state\n");
+<                         break;
+<                     case EVT_RELEASE_CNF :
+<                         break;
+<                     case EVT_INVALID :
+<                         break;
+<                     case EVT_DATA :
+<                         printf("received data : connected state\n");
+<         		printf("sending release : connected state\n");
+<                         sentvalue.mtype.subscriberevent=SUBS_EVT_RELEASE;
+<                         retval = sendpackettopeer(sd, &sentvalue, &timerData);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("cannot send release request\n");
+<                         }
+<                 	printf("going to : term_init state\n");
+<                         state = TERM_INITIATED;
+<                         break;
+<                     case EVT_NO_RESPONSE :
+<                         state = TERMINATED;
+<                         break;
+<                     case EVT_TIMER_EXPIRED :
+<                         printf("timer expired : connected state\n");
+<         		printf("sending release again : connected state\n");
+<                         sentvalue.mtype.subscriberevent=SUBS_EVT_RELEASE;
+<                         retval = sendpackettopeer(sd, &sentvalue, &timerData);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("cannot send release request\n");
+<                         }
+<                 	printf("going to : term_init state\n");
+<                         state = TERM_INITIATED;
+<                         break;
+<                     case EVT_COMMUNICATION_ERROR :
+<                         state = TERMINATED;
+<                         break;
+<                     default:
+<                         break;
+<                 }
+<                 break;
+<             case TERM_INITIATED :
+<                 switch (event)
+<                 {
+<                     case EVT_IN_PROGRESS :
+<                         break;
+<                     case EVT_ANSWER :
+<                         break;
+<                     case EVT_RELEASE_CNF :
+<                         printf("received release confirm : connected state\n");
+<                         retval = deleteTimer(timerData.tId);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("can not delete timer\n");
+<                         }
+<                         else
+<                         {
+<                             printf("timer deleted\n");
+<                         }
+<                 	printf("going to : terminated state\n");
+<                         state = TERMINATED;
+<                         break;
+<                     case EVT_INVALID :
+<                         break;
+<                     case EVT_DATA :
+<                         break;
+<                     case EVT_NO_RESPONSE :
+<                         state = TERMINATED;
+<                         break;
+<                     case EVT_TIMER_EXPIRED :
+<                         printf("timer expired data : term_init state\n");
+<         		printf("sending release again : term_init state\n");
+<                         sentvalue.mtype.subscriberevent=SUBS_EVT_RELEASE;
+<                         retval = sendpackettopeer(sd, &sentvalue, &timerData);
+<                         if (FAILURE == retval)
+<                         {
+<                             printf("cannot send release\n");
+<                         }
+<                         break;
+<                     case EVT_COMMUNICATION_ERROR :
+<                         state = TERMINATED;
+<                         break;
+<                     default:
+<                         break;
+<                 }
+<                 break;
+<             case TERMINATED :
+<                 printf("program should not come here \n");
+<                 break;
+<             default:
+<                 printf("program should not come here \n");
+<                 break;
+<         }
+<         if (FAILURE == retval)
+<             break;
+<         if (TERMINATED == state)
+<             break;
+<     }
+<     printf("exiting \n");
+<     retval = tcpcloseconnection(sd);
+<     if (FAILURE == retval)
+<     {
+<         return 1;
+<     }
+<     return 0;
+---
+> 	int			sd = 0;
+> 	TrsfrPacket		packet;
+> 	Message			sentvalue;
+> 	Message			recvdvalue;
+> 	TimerIdType		tId;
+> 	TimerExpType		timerData;
+> 	ReturnType		retval;
+> 
+> 	struct	sockaddr_in 	serveraddress;
+> 
+> 	if (argc != 3) {
+> 		printf("please provide following command line arguments\n");
+> 		printf("server IP address\n");
+> 		printf("server port\n");
+> 		exit(1);
+> 	}
+> 	retval = initializeplatform();
+> 	if (FAILURE == retval)
+> 	{
+> 		printf("platform initialization failed ");
+> 		exit(1);
+> 	}
+> 	
+> 	sd = socket(AF_INET, SOCK_STREAM, 0);
+> 	if( sd < 0 ) {
+> 		perror( "socket" );
+> 		exit( 1 );
+> 	}
+> 
+> 	//the data to be sent to the server
+> 
+> 	memset( &serveraddress, 0, sizeof(serveraddress) );
+> 	serveraddress.sin_family = AF_INET;
+> 	serveraddress.sin_port   = htons(atoi(argv[2]));    //SERVER TCP PORT
+> 	serveraddress.sin_addr.s_addr = inet_addr(argv[1]); //SERVER IP ADDRESS
+> 	if (0 != connect(sd,(struct sockaddr*)&serveraddress,sizeof(serveraddress)))
+> 	{
+> 		printf("cannot connect to server");
+> 		close(sd);
+> 		exit(1);
+> 	}
+> 	sentvalue.mtype.subscriberEvent = SUBS_EVT_DIGITS_DIALLED;
+> 	memcpy(&packet, &sentvalue, sizeof(sentvalue));
+> 	write(sd, &packet, sizeof(packet));
+> 
+> 	memcpy(&timerData.packet, &packet, sizeof(packet));
+> 	timerData.sd = sd;
+> 	timerData.resendcount = RESEND_LIMIT;
+> 	retval = createtimer(TIMEOUT_PERIOD, 5, sendData, &timerData, &tId);
+> 	if (FAILURE == retval)
+> 	{
+> 		printf("cannot create a timer");
+> 		close(sd);
+> 		exit(1);
+> 	}
+> 	read(sd, &packet, sizeof(packet));
+> 
+> 	memcpy(&recvdvalue, &packet, sizeof(recvdvalue));
+> 
+> 	if (SWITCH_EVT_ANSWER == recvdvalue.mtype.switchEvent)
+> 	{
+> 		printf("received answer\n");
+> 		retval = deletetimer(tId);
+> 		if (FAILURE == retval)
+> 		{
+> 			printf("cannot delete the timer\n");
+> 		}
+> 		else
+> 		{
+> 			printf("deleted the timer\n");
+> 		}
+> 		sentvalue.mtype.subscriberEvent = SUBS_EVT_DATA;
+> 		memcpy(&packet, &sentvalue, sizeof(sentvalue));
+> 		write(sd, &packet, sizeof(packet));
+> 	}
+> 	while(1)
+> 	{
+> 		read(sd, &packet, sizeof(packet));
+> 		memcpy(&recvdvalue, &packet, sizeof(recvdvalue));
+> 		if (SWITCH_EVT_DATA == recvdvalue.mtype.switchEvent)
+> 		{
+> 			break;
+> 		}
+> 		else
+> 		{
+> 			printf("received proper response for invalid message \n");
+> 		}
+> 	}
+> 	if (SWITCH_EVT_DATA == recvdvalue.mtype.switchEvent)
+> 	{
+> 		printf("received data\n");
+> 		printf("sending out of turn message\n");
+> 		sentvalue.mtype.subscriberEvent = SUBS_EVT_DIGITS_DIALLED;
+> 		memcpy(&packet, &sentvalue, sizeof(sentvalue));
+> 		write(sd, &packet, sizeof(packet));
+> 	}
+> 	read(sd, &packet, sizeof(packet));
+> 	memcpy(&recvdvalue, &packet, sizeof(recvdvalue));
+> 	if (SWITCH_EVT_INVALID == recvdvalue.mtype.switchEvent)
+> 	{
+> 		printf("received proper response for invalid message \n");
+> 		sentvalue.mtype.subscriberEvent = SUBS_EVT_DATA;
+> 		memcpy(&packet, &sentvalue, sizeof(sentvalue));
+> 		write(sd, &packet, sizeof(packet));
+> 	}
+> 	read(sd, &packet, sizeof(packet));
+> 	memcpy(&recvdvalue, &packet, sizeof(recvdvalue));
+> 	if (SWITCH_EVT_DATA == recvdvalue.mtype.switchEvent)
+> 	{
+> 		printf("received data\n");
+> 		sentvalue.mtype.subscriberEvent = SUBS_EVT_RELEASE;
+> 		memcpy(&packet, &sentvalue, sizeof(sentvalue));
+> 		write(sd, &packet, sizeof(packet));
+> 	}
+> 	read(sd, &packet, sizeof(packet));
+> 	memcpy(&recvdvalue, &packet, sizeof(recvdvalue));
+> 	if (SWITCH_EVT_RELEASE_CNF == recvdvalue.mtype.switchEvent)
+> 	{
+> 		printf("received release conf\n");
+> 	}
+> 
+> 	printf("exiting \n");
+> 	close(sd);
+> 	return 0;

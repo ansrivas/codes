@@ -1,0 +1,30 @@
+int main()
+{
+
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# define PREDEF_PLATFORM_UNIX
+  printf("Unix\n");
+#endif
+ 
+#if defined(PREDEF_PLATFORM_UNIX)
+# include <unistd.h>
+# if defined(_XOPEN_VERSION)
+#  if (_XOPEN_VERSION >= 3)
+#   define PREDEF_STANDARD_XOPEN_1989
+#  endif
+#  if (_XOPEN_VERSION >= 4)
+#   define PREDEF_STANDARD_XOPEN_1992
+#  endif
+#  if (_XOPEN_VERSION >= 4) && defined(_XOPEN_UNIX)
+#   define PREDEF_STANDARD_XOPEN_1995
+#  endif
+#  if (_XOPEN_VERSION >= 500)
+#   define PREDEF_STANDARD_XOPEN_1998
+#  endif
+#  if (_XOPEN_VERSION >= 600)
+#   define PREDEF_STANDARD_XOPEN_2003
+#  endif
+# endif
+#endif
+
+}

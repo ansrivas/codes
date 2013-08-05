@@ -1,0 +1,5 @@
+tar -cvf develop.tar ./develop
+datevar=`date +%F`
+dirname=develop_$datevar
+mkdir $dirname
+mv develop.tar ./$dirname

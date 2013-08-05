@@ -1,0 +1,14 @@
+# Make File for anagram program
+
+anagram: main.o util.o anagram.h
+	gcc -o anagram -g main.o util.o
+
+main.o: main.c anagram.h
+	gcc -c -g main.c
+	
+util.o: util.c anagram.h
+	gcc -c -g util.c
+
+clean:
+	rm anagram
+	rm *.o

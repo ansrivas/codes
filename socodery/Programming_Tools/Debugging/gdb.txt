@@ -1,0 +1,37 @@
+The program is not being run.
+Starting program: /user/socodery/Programming_Tools/Debugging/a.out 
+
+Breakpoint 1, main (argc=1, argv=0x7fbffff8f8) at ex4.c:13
+13	  if (argc != 3) {
+14	    fprintf(stderr, "\nCIPHER syntax: cipher file password\n\n");
+19	  strcpy(fileName, argv[1]);
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000358546f6b0 in strcpy () from /lib64/tls/libc.so.6
+The program is running.  Exit anyway? (y or n) 27	      printf("In main():\n");
+x = 5
+xptr = (int *) 0x7fbffff80c
+Num Type           Disp Enb Address            What
+1   breakpoint     keep y   0x00000000004004b0 in main
+                                               at gdb_sample_pointer_1_0.c:24
+	breakpoint already hit 1 time
+28	      printf("   x is %d and is stored at %p.\n", x, &x);
+Continuing.
+
+Program exited normally.
+Starting program: /user/socodery/Programming_Tools/Debugging/a.out 
+
+Breakpoint 1, main () at gdb_sample_pointer_1_0.c:24
+24	      int x = 5;
+Continuing.
+
+Breakpoint 2, display (z=5, zptr=0x7fbffff80c) at gdb_sample_pointer_1_0.c:39
+39	      *zptr = 2500;
+Continuing.
+
+Breakpoint 2, display (z=100, zptr=0x7fbffff80c)
+    at gdb_sample_pointer_1_0.c:39
+39	      *zptr = 2500;
+Continuing.
+
+Program exited normally.

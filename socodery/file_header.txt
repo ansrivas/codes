@@ -1,0 +1,14 @@
+/*************************************************************************
+*
+*  FILE NAME    : cartesian_polar_conversion.c
+*
+*  DESCRIPTION  : Contains main function and subsequent function calls
+*                 for the program to remove all characters from a string.
+*
+*  DATE    NAME    REFERENCE          REASON
+*
+*  8-MAR-08  Sibu    C FG 1.0           Initial creation
+*
+*   2008,  Technologies (Holdings) Ltd
+*
+**************************************************************************/

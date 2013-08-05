@@ -1,0 +1,26 @@
+Num Type           Disp Enb Address            What
+1   breakpoint     keep y   0x00000000004004b0 in main
+                                               at gdb_sample_pointer_1_0.c:24
+	breakpoint already hit 1 time
+3   breakpoint     keep y   0x00000000004004b0 in main
+                                               at gdb_sample_pointer_1_0.c:24
+	breakpoint already hit 1 time
+4   breakpoint     keep y   0x000000000040052b in display
+                                               at gdb_sample_pointer_1_0.c:39
+	breakpoint already hit 1 time
+37	{
+38	      
+39	      *zptr = 2500;
+40	
+41	      printf("In display():\n");
+The program is running.  Exit anyway? (y or n) No breakpoint number 2.
+Num Type           Disp Enb Address            What
+1   breakpoint     keep y   0x00000000004004b0 in main
+                                               at gdb_sample_pointer_1_0.c:24
+	breakpoint already hit 1 time
+3   breakpoint     keep y   0x000000000040052b in display
+                                               at gdb_sample_pointer_1_0.c:39
+Num Type           Disp Enb Address            What
+1   breakpoint     keep y   0x00000000004004b0 in main
+                                               at gdb_sample_pointer_1_0.c:24
+	breakpoint already hit 1 time
